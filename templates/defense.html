@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HackerMind // Defense Lab</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+body { background-color: #10141a; color: #dfe2eb; font-family: 'Hanken Grotesk', sans-serif; }
+.glass-panel { background: rgba(16,20,26,0.5); backdrop-filter: blur(12px); border: 1px solid rgba(235,255,226,0.1); }
+.rim-light { box-shadow: inset 0 1px 0 0 rgba(235,255,226,0.05), 0 0 15px rgba(0,230,57,0.05); }
+.grid-pattern { background-image: linear-gradient(rgba(0,230,57,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,230,57,0.04) 1px, transparent 1px); background-size: 24px 24px; }
+.scroll-custom::-webkit-scrollbar { width: 4px; }
+.scroll-custom::-webkit-scrollbar-thumb { background: #00e639; }
+</style>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{
+  "secondary":"#dab9ff","on-primary":"#003907","surface-container-low":"#181c22",
+  "on-background":"#dfe2eb","on-surface":"#dfe2eb","surface-container-lowest":"#0a0e14",
+  "outline":"#84967e","surface-container":"#1c2026","surface":"#10141a",
+  "primary-container":"#00ff41","primary-fixed-dim":"#00e639","background":"#10141a",
+  "primary":"#ebffe2","outline-variant":"#3b4b37","tertiary-fixed-dim":"#ffba38",
+  "on-surface-variant":"#b9ccb2","surface-variant":"#31353c","surface-container-high":"#262a31",
+  "error":"#ffb4ab","surface-container-highest":"#31353c"
+},
+fontFamily:{"label-sm":["JetBrains Mono"],"body-md":["Hanken Grotesk"],"headline-md":["Hanken Grotesk"],"code-md":["JetBrains Mono"]},
+fontSize:{"headline-md":["24px",{"lineHeight":"1.3","fontWeight":"600"}],"label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.1em","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"code-md":["14px",{"lineHeight":"1.5","fontWeight":"500"}]},
+spacing:{"gutter":"24px","unit":"4px"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"}}}}
+</script>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen flex flex-col overflow-hidden">
+
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface/80 backdrop-blur-xl border-b border-white/10">
+  <span class="font-headline-md text-headline-md font-bold text-primary tracking-tighter">HackerMind</span>
+  <span class="font-label-sm text-label-sm text-primary-fixed-dim" id="headerAgent"></span>
+</header>
+
+<div class="flex flex-1 pt-16 h-full">
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 bg-surface-container-low/50 backdrop-blur-lg border-r border-outline-variant/20 w-64 pt-20">
+  <div class="mb-8 px-2">
+    <h2 class="font-code-md text-code-md text-primary">CYBER_OS</h2>
+    <p class="font-label-sm text-label-sm text-on-surface-variant opacity-60" id="sidebarAgent"></p>
+  </div>
+  <nav class="space-y-1">
+    <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/dashboard"><span class="material-symbols-outlined">terminal</span><span class="font-label-sm text-label-sm">Missions</span></a>
+    <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/analyst"><span class="material-symbols-outlined">psychology</span><span class="font-label-sm text-label-sm">Analyst</span></a>
+    <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/riskmap"><span class="material-symbols-outlined">radar</span><span class="font-label-sm text-label-sm">Risk Map</span></a>
+    <a class="flex items-center gap-3 px-3 py-2 bg-primary-container text-on-primary-container rounded-lg font-bold" href="/defense"><span class="material-symbols-outlined">biotech</span><span class="font-label-sm text-label-sm">Defense Lab</span></a>
+  </nav>
+  <div class="mt-auto">
+    <a href="/dashboard" class="w-full block text-center py-3 bg-primary text-on-primary font-label-sm text-label-sm font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">NEW ANALYSIS</a>
+  </div>
+</aside>
+
+<main class="ml-64 flex-1 grid grid-cols-12 grid-rows-6 gap-4 p-gutter overflow-y-auto grid-pattern pt-4">
+
+<section class="col-span-8 row-span-4 glass-panel rim-light rounded-xl flex flex-col">
+  <div class="p-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-high/40">
+    <div class="flex items-center gap-2">
+      <span class="font-label-sm text-[10px] text-primary px-2 py-1 bg-primary/10 border border-primary/20 rounded">DEFENSE_LAB</span>
+      <h3 class="font-headline-md text-headline-md">Defense Strategies</h3>
+    </div>
+    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+  </div>
+  <div class="flex-1 p-6 overflow-y-auto scroll-custom" id="defenseContent">
+    <p class="text-on-surface-variant text-sm">Run an analysis to see defense strategies.</p>
+  </div>
+</section>
+
+<section class="col-span-4 row-span-3 glass-panel rim-light rounded-xl flex flex-col">
+  <div class="p-4 border-b border-outline-variant/20 bg-surface-container-high/40">
+    <span class="font-label-sm text-[10px] text-secondary">LIVE_FEED</span>
+    <h3 class="font-headline-md text-headline-md text-lg">Attack Visualization</h3>
+  </div>
+  <div class="flex-1 bg-black/40 relative overflow-hidden p-4">
+    <div id="attackViz" class="space-y-3">
+      <p class="text-on-surface-variant text-xs">Waiting for data...</p>
+    </div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-primary/10 rounded-full animate-ping opacity-10"></div>
+  </div>
+</section>
+
+<section class="col-span-4 row-span-3 glass-panel rim-light rounded-xl flex flex-col">
+  <div class="p-4 border-b border-outline-variant/20 bg-surface-container-high/40">
+    <span class="font-label-sm text-[10px] text-primary">TOOL_INDEX</span>
+    <h3 class="font-headline-md text-headline-md text-lg">Defensive Library</h3>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 space-y-2 scroll-custom">
+    <div class="p-3 bg-surface-container/50 border border-outline-variant/20 rounded-lg hover:border-primary/50 transition-all"><span class="font-label-sm text-xs text-primary">IPS_BLOCKER</span><p class="text-[11px] text-on-surface-variant mt-1">Intrusion prevention for packet inspection.</p></div>
+    <div class="p-3 bg-surface-container/50 border border-outline-variant/20 rounded-lg hover:border-secondary/50 transition-all"><span class="font-label-sm text-xs text-secondary">SHA_256_AUTH</span><p class="text-[11px] text-on-surface-variant mt-1">Hashing protocol for file integrity.</p></div>
+    <div class="p-3 bg-surface-container/50 border border-outline-variant/20 rounded-lg hover:border-tertiary-fixed-dim/50 transition-all"><span class="font-label-sm text-xs text-tertiary-fixed-dim">DDoS_SHIELD</span><p class="text-[11px] text-on-surface-variant mt-1">Traffic scrubbing and rate-limiting.</p></div>
+    <div class="p-3 bg-surface-container/50 border border-outline-variant/20 rounded-lg hover:border-primary/50 transition-all"><span class="font-label-sm text-xs text-primary">WAF_LAYER7</span><p class="text-[11px] text-on-surface-variant mt-1">Web application firewall protection.</p></div>
+    <div class="p-3 bg-surface-container/50 border border-outline-variant/20 rounded-lg hover:border-primary/50 transition-all"><span class="font-label-sm text-xs text-primary">ZERO_TRUST</span><p class="text-[11px] text-on-surface-variant mt-1">Never trust, always verify architecture.</p></div>
+  </div>
+</section>
+
+<section class="col-span-8 row-span-2 glass-panel rim-light rounded-xl p-6 flex flex-col">
+  <div class="flex justify-between items-center mb-4">
+    <div>
+      <span class="font-label-sm text-[10px] text-primary">PERFORMANCE_ANALYTICS</span>
+      <h3 class="font-headline-md text-headline-md">Strategy Scorecard</h3>
+    </div>
+    <div class="text-right">
+      <p class="font-label-sm text-[10px] text-on-surface-variant">OVERALL_EFFICIENCY</p>
+      <p class="font-headline-md text-headline-md text-primary" id="overallScore">--</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-3 gap-6">
+    <div class="space-y-2">
+      <div class="flex justify-between"><span class="font-label-sm text-xs text-on-surface-variant">RESILIENCE</span><span class="font-code-md text-primary" id="resScore">--</span></div>
+      <div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden"><div class="h-full bg-primary transition-all duration-1000" id="resBar" style="width:0%"></div></div>
+    </div>
+    <div class="space-y-2">
+      <div class="flex justify-between"><span class="font-label-sm text-xs text-on-surface-variant">COVERAGE</span><span class="font-code-md text-secondary" id="covScore">--</span></div>
+      <div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden"><div class="h-full bg-secondary transition-all duration-1000" id="covBar" style="width:0%"></div></div>
+    </div>
+    <div class="space-y-2">
+      <div class="flex justify-between"><span class="font-label-sm text-xs text-on-surface-variant">MITIGATION</span><span class="font-code-md text-tertiary-fixed-dim" id="mitScore">--</span></div>
+      <div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden"><div class="h-full bg-tertiary-fixed-dim transition-all duration-1000" id="mitBar" style="width:0%"></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const agentName = localStorage.getItem('hackermind_agent');
+if (!agentName) window.location.href = '/';
+document.getElementById('headerAgent').textContent = agentName + ' 👾';
+document.getElementById('sidebarAgent').textContent = agentName;
+
+const results = localStorage.getItem('hackermind_results');
+if (results) {
+  const data = JSON.parse(results);
+
+  if (data.defenses) {
+    const content = document.getElementById('defenseContent');
+    const lines = data.defenses.split('\n').filter(l => l.trim());
+    content.innerHTML = '';
+    lines.forEach(line => {
+      const clean = line.replace(/\*\*/g,'').replace(/#+\s*/g,'').trim();
+      if (!clean) return;
+      if (line.startsWith('#') || line.startsWith('**')) {
+        const h = document.createElement('h4');
+        h.className = 'font-label-sm text-label-sm text-primary mt-4 mb-2 uppercase tracking-wider';
+        h.textContent = clean;
+        content.appendChild(h);
+      } else {
+        const p = document.createElement('p');
+        p.className = 'text-sm text-on-surface-variant mb-2 border-l-2 border-primary/20 pl-3';
+        p.textContent = clean;
+        content.appendChild(p);
+      }
+    });
+  }
+
+  const risk = data.overall_risk || 0;
+  document.getElementById('attackViz').innerHTML = `
+    <div class="flex items-center justify-between mb-2">
+      <span class="font-label-sm text-[10px] text-error">THREAT: ${risk > 70 ? 'CRITICAL' : risk > 40 ? 'HIGH' : 'MODERATE'}</span>
+      <span class="font-code-md text-[10px] text-error">${risk}%</span>
+    </div>
+    <div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden mb-3">
+      <div class="h-full ${risk > 70 ? 'bg-error' : 'bg-tertiary-fixed-dim'} animate-pulse" style="width:${risk}%"></div>
+    </div>
+    <div class="flex items-center justify-between">
+      <span class="font-label-sm text-[10px] text-primary">DEFENSE_ACTIVE</span>
+      <span class="font-code-md text-[10px] text-primary">MITIGATING...</span>
+    </div>
+  `;
+
+  const defense = 100 - risk;
+  const res = Math.min(100, defense + 10);
+  const cov = Math.min(100, defense + 5);
+  const mit = defense;
+  const overall = Math.round((res + cov + mit) / 3);
+
+  document.getElementById('overallScore').textContent = overall + '%';
+  document.getElementById('resScore').textContent = res + '%';
+  document.getElementById('covScore').textContent = cov + '%';
+  document.getElementById('mitScore').textContent = mit + '%';
+  setTimeout(() => {
+    document.getElementById('resBar').style.width = res + '%';
+    document.getElementById('covBar').style.width = cov + '%';
+    document.getElementById('mitBar').style.width = mit + '%';
+  }, 300);
+
+} else {
+  document.getElementById('defenseContent').innerHTML = '<p class="text-error text-sm">No data. <a href="/dashboard" class="text-primary underline">Run analysis first.</a></p>';
+}
+</script>
+</body>
+</html>
 
