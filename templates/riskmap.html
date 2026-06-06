@@ -1,1 +1,269 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HackerMind // Risk Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+body { background-color: #10141a; color: #dfe2eb; font-family: 'Hanken Grotesk', sans-serif; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.terminal-cursor { animation: blink 1s step-end infinite; }
+.glass-panel { backdrop-filter: blur(12px); border: 1px solid rgba(235,255,226,0.1); background: linear-gradient(135deg, rgba(16,20,26,0.7), rgba(28,32,38,0.5)); }
+.node-glow-primary { filter: drop-shadow(0 0 8px rgba(0,230,57,0.6)); }
+.node-glow-error { filter: drop-shadow(0 0 12px rgba(255,180,171,0.8)); }
+.node-glow-secondary { filter: drop-shadow(0 0 8px rgba(218,185,255,0.6)); }
+.node-glow-warning { filter: drop-shadow(0 0 8px rgba(255,186,56,0.6)); }
+.grid-bg {
+  background-image: linear-gradient(rgba(0,230,57,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,230,57,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.perspective-map { perspective: 1200px; transform-style: preserve-3d; }
+.map-layer { transform: rotateX(45deg) rotateZ(-15deg); }
+</style>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{
+  "secondary":"#dab9ff","on-primary":"#003907","surface-container-low":"#181c22",
+  "on-background":"#dfe2eb","on-surface":"#dfe2eb","surface-container-lowest":"#0a0e14",
+  "outline":"#84967e","surface-container":"#1c2026","surface":"#10141a",
+  "primary-container":"#00ff41","primary-fixed-dim":"#00e639","background":"#10141a",
+  "primary":"#ebffe2","outline-variant":"#3b4b37","tertiary-fixed-dim":"#ffba38",
+  "on-surface-variant":"#b9ccb2","surface-variant":"#31353c","surface-container-high":"#262a31",
+  "error":"#ffb4ab","surface-container-highest":"#31353c"
+},
+fontFamily:{"label-sm":["JetBrains Mono"],"body-md":["Hanken Grotesk"],"headline-md":["Hanken Grotesk"],"code-md":["JetBrains Mono"]},
+fontSize:{"headline-md":["24px",{"lineHeight":"1.3","fontWeight":"600"}],"label-sm":["12px",{"lineHeight":"1","letterSpacing":"0.1em","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"code-md":["14px",{"lineHeight":"1.5","fontWeight":"500"}]},
+spacing:{"gutter":"24px","unit":"4px"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"}}}}
+</script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden" style="background-image: url('/static/matrix-bg.png'); background-size: cover; background-position: center; background-attachment: fixed;">
 
+
+  <span class="font-headline-md text-headline-md font-bold text-primary tracking-tighter">HackerMind</span>
+  <span class="font-label-sm text-label-sm text-primary-fixed-dim hidden" id="headerAgent"></span>
+
+</header>
+
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface-container-low/50 backdrop-blur-lg border-r border-outline-variant/20 flex flex-col p-4 gap-4 z-40">
+  <div class="flex items-center gap-3 mb-6 p-2">
+    <div>
+      <p class="font-code-md text-code-md text-primary leading-none">CYBER_OS</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant opacity-60" id="sidebarAgent"></p>
+    </div>
+  </div>
+  <nav class="flex-grow space-y-1">
+    <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/dashboard"><span class="material-symbols-outlined">terminal</span><span class="font-label-sm text-label-sm">Missions</span></a>
+    <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/analyst"><span class="material-symbols-outlined">psychology</span><span class="font-label-sm text-label-sm">Analyst</span></a>
+    <a class="flex items-center gap-3 px-3 py-2 bg-primary-container text-on-primary-container rounded-lg font-bold" href="/riskmap"><span class="material-symbols-outlined">radar</span><span class="font-label-sm text-label-sm">Risk Map</span></a>
+    <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/defense"><span class="material-symbols-outlined">biotech</span><span class="font-label-sm text-label-sm">Defense Lab</span></a>
+  </nav>
+  <div class="mt-auto pt-4 border-t border-outline-variant/10">
+    <a href="/dashboard" class="w-full block text-center py-3 bg-primary-container text-on-primary font-label-sm text-label-sm font-bold rounded-lg hover:brightness-110 transition-all">NEW ANALYSIS</a>
+  </div>
+</aside>
+
+<main class="md:ml-64 h-screen relative bg-surface-dim overflow-hidden grid-bg" style="padding-top: 0;">
+<div class="absolute inset-0 flex items-center justify-center perspective-map overflow-hidden pointer-events-none" style="top: 64px;">
+  <div class="map-layer relative w-[1000px] h-[1000px]" id="mapLayer">
+
+    <div id="coreNode" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full glass-panel flex items-center justify-center pointer-events-auto cursor-pointer node-glow-primary border-primary/50" onclick="selectNode('CORE','Central System','Healthy','Main system hub — all agents report here.')">
+      <div class="w-20 h-20 rounded-full border border-primary/20 animate-pulse flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-4xl">database</span>
+      </div>
+    </div>
+
+    <div id="webNode" class="absolute top-1/4 left-1/4 w-20 h-20 glass-panel rounded-xl flex items-center justify-center pointer-events-auto cursor-pointer" onclick="selectNode('WEB_SERVER','Web Application','Critical','SQL Injection and XSS vulnerabilities detected.')">
+      <span class="material-symbols-outlined text-3xl">language</span>
+      <div id="webAlert" class="absolute -top-2 -right-2 px-2 py-0.5 bg-error text-on-error rounded font-label-sm text-[10px] hidden">Alert</div>
+    </div>
+
+    <div id="apiNode" class="absolute top-1/3 right-1/4 w-16 h-16 glass-panel rounded-xl flex items-center justify-center pointer-events-auto cursor-pointer node-glow-primary" onclick="selectNode('API_GW','API Gateway','Healthy','API endpoints operational.')">
+      <span class="material-symbols-outlined text-primary text-2xl">api</span>
+    </div>
+
+    <div id="dbNode" class="absolute bottom-1/4 left-1/3 w-16 h-16 glass-panel rounded-xl flex items-center justify-center pointer-events-auto cursor-pointer" onclick="selectNode('DATABASE','Database Server','Warning','Encryption protocols may be outdated.')">
+      <span class="material-symbols-outlined text-secondary text-2xl">storage</span>
+    </div>
+
+    <div id="cloudNode" class="absolute bottom-1/3 right-1/3 w-16 h-16 glass-panel rounded-xl flex items-center justify-center pointer-events-auto cursor-pointer node-glow-primary" onclick="selectNode('CLOUD','Cloud Infrastructure','Healthy','Cloud services operational.')">
+      <span class="material-symbols-outlined text-primary text-2xl">cloud</span>
+    </div>
+
+    <svg class="absolute inset-0 w-full h-full -z-10 opacity-30" viewBox="0 0 1000 1000">
+      <path d="M 500,500 L 250,250" stroke="#ffb4ab" stroke-dasharray="8 4" stroke-width="2"><animate attributeName="stroke-dashoffset" dur="4s" from="200" to="0" repeatCount="indefinite"></animate></path>
+      <path d="M 500,500 L 750,333" stroke="#00ff41" stroke-width="1.5"></path>
+      <path d="M 500,500 L 333,750" stroke="#dab9ff" stroke-width="1.5"></path>
+      <path d="M 500,500 L 667,667" stroke="#00ff41" stroke-width="1.5"></path>
+    </svg>
+  </div>
+</div>
+
+<div class="absolute top-8 left-8 pointer-events-auto">
+  <div class="glass-panel p-4 rounded-xl border-l-4 border-l-primary mb-4">
+    <h1 class="font-headline-md text-headline-md text-primary mb-1">Global Vulnerability Map</h1>
+    <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+      SYSTEMS_LIVE // SCAN_CONTINUOUS
+    </p>
+  </div>
+  <div class="glass-panel p-3 rounded-xl">
+    <p class="font-label-sm text-[10px] text-primary mb-2">RISK_SUMMARY</p>
+    <p class="font-headline-md text-headline-md text-error" id="mapRiskScore">--</p>
+    <p class="text-[10px] text-on-surface-variant">Overall Risk Index</p>
+  </div>
+</div>
+
+<div class="absolute right-8 top-8 bottom-8 w-80 glass-panel rounded-2xl border border-white/10 flex flex-col translate-x-[120%] transition-transform duration-500 ease-in-out pointer-events-auto z-50 overflow-hidden" id="detailsPanel">
+  <div class="p-6 border-b border-white/10 flex justify-between items-start">
+    <div>
+      <span class="px-2 py-0.5 border border-primary/50 text-primary font-label-sm text-[10px] rounded mb-2 inline-block" id="nodeTag">NODE_ID</span>
+      <h2 class="font-headline-md text-headline-md text-on-surface leading-tight" id="nodeTitle">Select Node</h2>
+    </div>
+    <button class="text-on-surface-variant hover:text-primary" onclick="closePanel()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+  <div class="flex-grow p-6 space-y-4 overflow-y-auto">
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">RISK_LEVEL</span>
+        <span class="font-label-sm text-label-sm text-primary" id="nodeRisk">SCANNING...</span>
+      </div>
+      <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+        <div class="h-full bg-primary transition-all duration-500" id="nodeRiskBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">Diagnostic</h3>
+      <div class="p-3 bg-surface-container-lowest/50 rounded-lg border border-outline-variant/10">
+        <p class="font-code-md text-code-md text-on-surface leading-relaxed italic text-sm" id="nodeDesc">Select a node to see details.</p>
+      </div>
+    </div>
+    <div id="nodeVulns"></div>
+  </div>
+  <div class="p-6 border-t border-white/10">
+    <a href="/analyst" class="w-full block text-center py-3 bg-primary text-on-primary font-bold rounded-lg shadow-[0_0_20px_rgba(0,230,57,0.3)] hover:brightness-110 transition-all text-sm">VIEW FULL ANALYSIS</a>
+  </div>
+</div>
+
+<div class="absolute bottom-8 left-8 pointer-events-none">
+  <div class="flex gap-4">
+    <div class="glass-panel p-3 rounded-lg border-b-2 border-primary">
+      <p class="font-label-sm text-[10px] text-on-surface-variant opacity-50 mb-1">LATENCY</p>
+      <p class="font-code-md text-primary" id="latencyVal">12.4ms</p>
+    </div>
+    <div class="glass-panel p-3 rounded-lg border-b-2 border-error">
+      <p class="font-label-sm text-[10px] text-on-surface-variant opacity-50 mb-1">THREATS</p>
+      <p class="font-code-md text-error" id="threatCount">--</p>
+    </div>
+    <div class="glass-panel p-3 rounded-lg border-b-2 border-secondary">
+      <p class="font-label-sm text-[10px] text-on-surface-variant opacity-50 mb-1">RISK_SCORE</p>
+      <p class="font-code-md text-secondary" id="riskVal">--</p>
+    </div>
+  </div>
+</div>
+
+<div class="absolute bottom-8 right-8 w-64 glass-panel p-3 rounded-lg pointer-events-none opacity-60">
+  <p class="font-label-sm text-[10px] text-primary border-b border-primary/20 pb-1 mb-2">SYSTEM_LOGS</p>
+  <div class="font-label-sm text-[9px] text-on-surface-variant space-y-1" id="systemLogs">
+    <p>> INITIALIZING_SCAN...</p>
+    <p>> TRACING_NODES...</p>
+    <p>> <span class="text-primary">SYSTEM_NOMINAL</span></p>
+    <p>_ <span class="terminal-cursor text-primary">|</span></p>
+  </div>
+</div>
+
+</main>
+
+<script>
+const agentName = localStorage.getItem('hackermind_agent');
+if (!agentName) window.location.href = '/';
+document.getElementById('headerAgent').textContent = agentName + ' 👾';
+document.getElementById('sidebarAgent').textContent = agentName;
+
+const results = localStorage.getItem('hackermind_results');
+if (results) {
+  const data = JSON.parse(results);
+  const scores = data.scores || {};
+  const risk = data.overall_risk || 0;
+
+  document.getElementById('mapRiskScore').textContent = risk + '%';
+  document.getElementById('riskVal').textContent = risk + '%';
+  document.getElementById('threatCount').textContent = risk > 70 ? 'CRITICAL' : risk > 40 ? 'HIGH' : 'LOW';
+
+  const webNode = document.getElementById('webNode');
+  const sqlRisk = scores.sql_injection || 0;
+  const xssRisk = scores.xss || 0;
+  if (sqlRisk > 70 || xssRisk > 70) {
+    webNode.classList.add('node-glow-error');
+    webNode.querySelector('span').classList.add('text-error');
+    document.getElementById('webAlert').classList.remove('hidden');
+  } else {
+    webNode.classList.add('node-glow-primary');
+    webNode.querySelector('span').classList.add('text-primary');
+  }
+
+  const dbNode = document.getElementById('dbNode');
+  const dataRisk = scores.data_exposure || 0;
+  if (dataRisk > 60) {
+    dbNode.classList.add('node-glow-warning');
+    dbNode.querySelector('span').classList.add('text-tertiary-fixed-dim');
+  }
+
+  const logs = document.getElementById('systemLogs');
+  logs.innerHTML = `
+    <p>> SCAN_COMPLETE ✓</p>
+    <p>> NODES_ANALYZED: 5</p>
+    <p>> RISK_INDEX: ${risk}%</p>
+    <p>> <span class="text-primary">${risk > 70 ? 'CRITICAL_ALERT' : 'SYSTEM_NOMINAL'}</span></p>
+    <p>_ <span class="terminal-cursor text-primary">|</span></p>
+  `;
+}
+
+function selectNode(id, title, risk, desc) {
+  const panel = document.getElementById('detailsPanel');
+  document.getElementById('nodeTag').textContent = 'NODE_ID: ' + id;
+  document.getElementById('nodeTitle').textContent = title;
+  document.getElementById('nodeDesc').textContent = desc;
+  document.getElementById('nodeRisk').textContent = risk.toUpperCase();
+  
+  const riskPct = risk === 'Critical' ? 90 : risk === 'Warning' ? 55 : 20;
+  const barColor = risk === 'Critical' ? 'bg-error' : risk === 'Warning' ? 'bg-tertiary-fixed-dim' : 'bg-primary';
+  const bar = document.getElementById('nodeRiskBar');
+  bar.className = `h-full ${barColor} transition-all duration-500`;
+  setTimeout(() => bar.style.width = riskPct + '%', 100);
+
+  const vulns = document.getElementById('nodeVulns');
+  if (risk === 'Critical') {
+    vulns.innerHTML = `
+      <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">Detected Flaws</h3>
+      <div class="space-y-2">
+        <div class="flex items-start gap-2"><span class="material-symbols-outlined text-error text-sm mt-1">error</span><div><p class="font-label-sm text-label-sm text-error text-[10px]">INJECTION_RISK</p><p class="text-[10px] text-on-surface-variant">Input validation vulnerabilities detected</p></div></div>
+        <div class="flex items-start gap-2"><span class="material-symbols-outlined text-tertiary-fixed-dim text-sm mt-1">warning</span><div><p class="font-label-sm text-label-sm text-tertiary-fixed-dim text-[10px]">AUTH_BYPASS</p><p class="text-[10px] text-on-surface-variant">Authentication weaknesses identified</p></div></div>
+      </div>
+    `;
+  } else {
+    vulns.innerHTML = `<p class="text-xs text-on-surface-variant">No critical flaws detected on this node.</p>`;
+  }
+
+  panel.classList.remove('translate-x-[120%]');
+  panel.classList.add('translate-x-0');
+}
+
+function closePanel() {
+  const panel = document.getElementById('detailsPanel');
+  panel.classList.add('translate-x-[120%]');
+  panel.classList.remove('translate-x-0');
+}
+
+document.addEventListener('mousemove', (e) => {
+  const mapLayer = document.getElementById('mapLayer');
+  const xAxis = (window.innerWidth / 2 - e.pageX) / 80;
+  const yAxis = (window.innerHeight / 2 - e.pageY) / 80;
+  mapLayer.style.transform = `rotateX(${45 + yAxis}deg) rotateZ(${-15 + xAxis}deg)`;
+});
+</script>
+</body>
+</html>
