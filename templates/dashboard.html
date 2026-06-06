@@ -1,1 +1,447 @@
+cat > /mnt/user-data/outputs/dashboard.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HackerMind // Mission Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "secondary": "#dab9ff","on-primary": "#003907","surface-container-low": "#181c22","on-background": "#dfe2eb","secondary-container": "#602b9d","inverse-surface": "#dfe2eb","on-surface": "#dfe2eb","error-container": "#93000a","surface-container-lowest": "#0a0e14","secondary-fixed-dim": "#dab9ff","inverse-primary": "#006e16","outline": "#84967e","on-secondary-container": "#cfa7ff","surface-container": "#1c2026","surface": "#10141a","on-primary-container": "#007117","primary-container": "#00ff41","primary-fixed-dim": "#00e639","primary-fixed": "#72ff70","on-error-container": "#ffdad6","background": "#10141a","on-secondary": "#460283","primary": "#ebffe2","outline-variant": "#3b4b37","secondary-fixed": "#eedbff","tertiary-fixed-dim": "#ffba38","on-surface-variant": "#b9ccb2","surface-variant": "#31353c","surface-tint": "#00e639","surface-container-high": "#262a31","inverse-on-surface": "#2d3137","error": "#ffb4ab","on-error": "#690005","on-primary-fixed": "#002203","surface-container-highest": "#31353c"
+      },
+      "fontFamily": {"label-sm": ["JetBrains Mono"],"body-md": ["Hanken Grotesk"],"headline-lg": ["Hanken Grotesk"],"headline-md": ["Hanken Grotesk"],"code-md": ["JetBrains Mono"]},
+      "fontSize": {
+        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+        "headline-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+        "code-md": ["14px", {"lineHeight": "1.5", "fontWeight": "500"}]
+      },
+      "spacing": {"gutter": "24px","unit": "4px"},
+      "borderRadius": {"DEFAULT": "0.125rem","lg": "0.25rem","xl": "0.5rem","full": "0.75rem"}
+    }
+  }
+}
+</script>
+<style>
+body {
+    background-color: #10141a;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(0, 230, 57, 0.05) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255, 255, 255, 0.02) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255, 255, 255, 0.02) 40px);
+    background-attachment: fixed;
+}
+.hologram-card {
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+.hologram-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 230, 57, 0.3), transparent);
+}
+.scanline {
+    width: 100%; height: 2px;
+    background: rgba(0, 230, 57, 0.1);
+    position: absolute;
+    animation: scan 4s linear infinite;
+    z-index: 10;
+    pointer-events: none;
+}
+@keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+.segment-bar div {
+    width: 8px; height: 100%; margin-right: 2px;
+    background: rgba(235, 255, 226, 0.1);
+}
+.segment-bar div.active { background: #00e639; box-shadow: 0 0 10px #00e639; }
+</style>
+</head>
+<body class="text-on-background font-body-md">
 
+<!-- TopNavBar - Clean, no duplicate nav -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-[0_0_15px_rgba(0,230,57,0.1)]">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tighter">HackerMind</span>
+<div class="flex items-center gap-3">
+    <span class="font-label-sm text-label-sm text-primary-fixed-dim" id="headerAgent"></span>
+    <a href="/" class="text-xs text-on-surface-variant hover:text-error transition-colors font-label-sm">LOGOUT</a>
+</div>
+</header>
+
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] hidden md:flex flex-col p-4 gap-unit border-r border-outline-variant/20 bg-surface-container-low/50 backdrop-blur-lg w-64">
+<div class="mb-8 p-2">
+    <div class="font-code-md text-code-md text-primary mb-1">CYBER_OS</div>
+    <div class="font-label-sm text-label-sm opacity-60" id="sidebarAgent">Agent</div>
+</div>
+<div class="flex flex-col gap-2 flex-grow">
+    <a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold" href="/dashboard">
+        <span class="material-symbols-outlined">terminal</span>
+        <span class="font-label-sm text-label-sm">Mainframe</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/analyst">
+        <span class="material-symbols-outlined">psychology</span>
+        <span class="font-label-sm text-label-sm">Analyst</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/riskmap">
+        <span class="material-symbols-outlined">radar</span>
+        <span class="font-label-sm text-label-sm">Risk Map</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="/defense">
+        <span class="material-symbols-outlined">biotech</span>
+        <span class="font-label-sm text-label-sm">Defense Lab</span>
+    </a>
+</div>
+<div class="mt-auto pt-4">
+    <button onclick="startAnalysis()" class="w-full py-3 bg-primary-container text-on-primary text-label-sm font-bold rounded-lg shadow-[0_0_15px_rgba(0,230,57,0.4)] hover:brightness-110 transition-all active:scale-95 uppercase tracking-widest">LAUNCH ANALYSIS</button>
+</div>
+</aside>
+
+<!-- Main Content -->
+<main class="md:ml-64 pt-20 p-gutter min-h-screen flex flex-col">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+    <div>
+        <span class="font-label-sm text-label-sm text-primary-fixed-dim block mb-2 tracking-[0.2em]">COMMAND_CENTER_v4.2</span>
+        <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-tighter">Mission Dashboard</h1>
+        <p class="text-primary-fixed-dim font-code-md text-code-md mt-1">Hello, <span id="agentGreeting"></span> 👾</p>
+    </div>
+    <div class="hologram-card p-4 rounded-xl flex items-center gap-6 bg-surface-container/30">
+        <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm opacity-70 mb-1">THREAT_LEVEL</span>
+            <span class="font-headline-md text-headline-md text-error tracking-widest" id="threatLevel">SCANNING...</span>
+        </div>
+        <div class="flex gap-1 h-8 items-end">
+            <div class="w-2 h-2 bg-error shadow-[0_0_8px_#ffb4ab]"></div>
+            <div class="w-2 h-4 bg-error shadow-[0_0_8px_#ffb4ab]"></div>
+            <div class="w-2 h-6 bg-error shadow-[0_0_8px_#ffb4ab]"></div>
+            <div class="w-2 h-8 bg-error shadow-[0_0_8px_#ffb4ab]"></div>
+            <div class="w-2 h-3 bg-error/20"></div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 flex-grow">
+
+<!-- System Analysis Input -->
+<div class="md:col-span-8 group relative">
+<div class="hologram-card h-full rounded-xl bg-surface-container-low/40 flex flex-col overflow-hidden transition-all duration-500 hover:border-primary/40">
+<div class="scanline"></div>
+<div class="absolute top-4 left-4 font-label-sm text-label-sm bg-primary/10 text-primary px-2 py-1 border border-primary/20">NEW_OPERATION</div>
+<div class="p-8 flex flex-col justify-center h-full">
+    <h2 class="font-headline-md text-headline-md text-primary mb-2">Initialize Target Analysis</h2>
+    <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed">Describe your target system. HackerMind's 5 AI agents will analyze vulnerabilities and build defense strategies.</p>
+
+    <textarea id="systemInput" rows="4" placeholder="Example: A web application with login page, MySQL database, REST API hosted on AWS EC2 with admin panel..." class="w-full bg-surface-container-lowest/80 border border-outline-variant/30 rounded-lg p-4 text-on-surface font-code-md text-code-md resize-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all mb-4 placeholder:text-on-surface-variant/40"></textarea>
+
+    
+
+    <div id="progressSection" class="hidden mb-4">
+        <div class="flex justify-between font-label-sm text-label-sm mb-2">
+            <span id="progressLabel" class="text-primary-fixed-dim">INITIALIZING...</span>
+            <span class="text-primary" id="progressPct">0%</span>
+        </div>
+        <div class="h-2 w-full bg-surface-variant/30 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-full bg-primary-container shadow-[0_0_10px_#00e639] transition-all duration-700" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <button id="analyzeBtn" onclick="startAnalysis()" class="self-start px-6 py-3 bg-primary-container text-on-primary font-bold rounded-lg flex items-center gap-2 hover:scale-105 transition-transform active:scale-95">
+        <span class="material-symbols-outlined">radar</span>
+        <span class="font-label-sm text-label-sm">LAUNCH ANALYSIS</span>
+    </button>
+</div>
+</div>
+</div>
+
+<!-- Analyst Feed -->
+<div class="md:col-span-4">
+<div class="hologram-card h-full rounded-xl bg-surface-container-lowest border-outline-variant/10 flex flex-col p-6">
+    <div class="flex items-center justify-between mb-6 border-b border-outline-variant/20 pb-4">
+        <span class="font-label-sm text-label-sm text-secondary flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">analytics</span>ANALYST_FEED
+        </span>
+        <span class="font-label-sm text-label-sm opacity-40">REAL_TIME</span>
+    </div>
+    <div class="flex flex-col gap-4 overflow-y-auto" id="analystFeed">
+        <div class="border-l-2 border-primary/40 pl-4 py-1">
+            <div class="font-label-sm text-label-sm text-primary mb-1">04:12 UTC // SOURCE: CORE</div>
+            <div class="font-body-md text-on-surface text-sm">Subnet Alpha detected unusual outbound traffic.</div>
+        </div>
+        <div class="border-l-2 border-secondary/40 pl-4 py-1">
+            <div class="font-label-sm text-label-sm text-secondary mb-1">03:55 UTC // SOURCE: LAB</div>
+            <div class="font-body-md text-on-surface text-sm">New vulnerability patch successfully compiled.</div>
+        </div>
+        <div class="border-l-2 border-tertiary-fixed-dim/40 pl-4 py-1">
+            <div class="font-label-sm text-label-sm text-tertiary-fixed-dim mb-1">02:10 UTC // SOURCE: INTEL</div>
+            <div class="font-body-md text-on-surface text-sm">Dark web chatter indicates upcoming DDoS target.</div>
+        </div>
+        <div class="border-l-2 border-error/40 pl-4 py-1">
+            <div class="font-label-sm text-label-sm text-error mb-1">01:45 UTC // SOURCE: SENSOR</div>
+            <div class="font-body-md text-on-surface text-sm">Brute force attempt on port 8080. Origin: [REDACTED].</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Node Meters -->
+<div class="md:col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="hologram-card p-6 rounded-xl bg-surface-container-low/40">
+    <div class="flex justify-between items-start mb-4">
+        <div class="material-symbols-outlined text-primary">security</div>
+        <span class="font-label-sm text-label-sm opacity-50">NODE_01</span>
+    </div>
+    <div class="font-headline-md text-headline-md mb-2" id="integrityVal">--</div>
+    <div class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase">Integrity Status</div>
+    <div class="segment-bar flex h-3 w-full">
+        <div class="active"></div><div class="active"></div><div class="active"></div><div class="active"></div><div class="active"></div><div class="active"></div><div class="active"></div><div class="active"></div><div class="active"></div><div></div>
+    </div>
+</div>
+<div class="hologram-card p-6 rounded-xl bg-surface-container-low/40">
+    <div class="flex justify-between items-start mb-4">
+        <div class="material-symbols-outlined text-secondary">memory</div>
+        <span class="font-label-sm text-label-sm opacity-50">NODE_02</span>
+    </div>
+    <div class="font-headline-md text-headline-md mb-2" id="xssVal">--</div>
+    <div class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase">XSS Risk</div>
+    <div class="segment-bar flex h-3 w-full">
+        <div class="active bg-secondary shadow-[0_0_10px_#dab9ff]"></div><div class="active bg-secondary shadow-[0_0_10px_#dab9ff]"></div><div class="active bg-secondary shadow-[0_0_10px_#dab9ff]"></div><div class="active bg-secondary shadow-[0_0_10px_#dab9ff]"></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+</div>
+<div class="hologram-card p-6 rounded-xl bg-surface-container-low/40">
+    <div class="flex justify-between items-start mb-4">
+        <div class="material-symbols-outlined text-tertiary-fixed-dim">wifi_lock</div>
+        <span class="font-label-sm text-label-sm opacity-50">NODE_03</span>
+    </div>
+    <div class="font-headline-md text-headline-md mb-2" id="networkVal">--</div>
+    <div class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase">Network Risk</div>
+    <div class="segment-bar flex h-3 w-full">
+        <div class="active bg-tertiary-fixed-dim shadow-[0_0_10px_#ffba38]"></div><div class="active bg-tertiary-fixed-dim shadow-[0_0_10px_#ffba38]"></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+</div>
+<div class="hologram-card p-6 rounded-xl bg-surface-container-low/40">
+    <div class="flex justify-between items-start mb-4">
+        <div class="material-symbols-outlined text-error">dangerous</div>
+        <span class="font-label-sm text-label-sm opacity-50">NODE_04</span>
+    </div>
+    <div class="font-headline-md text-headline-md mb-2" id="sqlVal">--</div>
+    <div class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase">SQL Injection</div>
+    <div class="segment-bar flex h-3 w-full">
+        <div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div class="active bg-error shadow-[0_0_10px_#ffb4ab]"></div><div></div><div></div>
+    </div>
+</div>
+</div>
+
+<!-- Mission Cards -->
+<div class="md:col-span-12">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="hologram-card p-6 rounded-xl bg-surface-container-high/40 group hover:bg-surface-container-high/60 transition-all cursor-pointer" onclick="fillExample('web'); window.scrollTo(0,0);">
+    <div class="flex justify-between mb-4">
+        <span class="font-label-sm text-label-sm text-primary-fixed-dim border border-primary-fixed-dim/30 px-2 py-0.5">WEB_APP</span>
+        <span class="font-label-sm text-label-sm opacity-50">READY</span>
+    </div>
+    <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Phish Hook</h3>
+    <p class="font-body-md text-on-surface-variant mb-6 text-sm">Analyze a web application for social engineering and credential harvesting vulnerabilities.</p>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-2">
+            <span class="px-2 py-1 bg-surface-variant text-[10px] font-bold rounded">SOCIAL_ENG</span>
+            <span class="px-2 py-1 bg-surface-variant text-[10px] font-bold rounded">WEB_SEC</span>
+        </div>
+        <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+    </div>
+</div>
+<div class="hologram-card p-6 rounded-xl bg-surface-container-high/40 group hover:bg-surface-container-high/60 transition-all cursor-pointer" onclick="fillExample('bank'); window.scrollTo(0,0);">
+    <div class="flex justify-between mb-4">
+        <span class="font-label-sm text-label-sm text-error border border-error/30 px-2 py-0.5">BANKING</span>
+        <span class="font-label-sm text-label-sm opacity-50">READY</span>
+    </div>
+    <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Kernel Panic</h3>
+    <p class="font-body-md text-on-surface-variant mb-6 text-sm">Deep analysis of a financial system for API vulnerabilities and payment gateway exploits.</p>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-2">
+            <span class="px-2 py-1 bg-surface-variant text-[10px] font-bold rounded">FINTECH</span>
+            <span class="px-2 py-1 bg-surface-variant text-[10px] font-bold rounded">API_SEC</span>
+        </div>
+        <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+    </div>
+</div>
+<div class="hologram-card p-6 rounded-xl bg-surface-container-high/40 group hover:bg-surface-container-high/60 transition-all cursor-pointer" onclick="fillExample('cloud'); window.scrollTo(0,0);">
+    <div class="flex justify-between mb-4">
+        <span class="font-label-sm text-label-sm text-secondary border border-secondary/30 px-2 py-0.5">CLOUD</span>
+        <span class="font-label-sm text-label-sm opacity-50">READY</span>
+    </div>
+    <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Ghost In The Shell</h3>
+    <p class="font-body-md text-on-surface-variant mb-6 text-sm">Identify stealth vulnerabilities across distributed cloud clusters and microservices.</p>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-2">
+            <span class="px-2 py-1 bg-surface-variant text-[10px] font-bold rounded">STEALTH</span>
+            <span class="px-2 py-1 bg-surface-variant text-[10px] font-bold rounded">CLOUD</span>
+        </div>
+        <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+    </div>
+</div>
+</div>
+</div>
+
+</div>
+
+<footer class="w-full py-4 px-gutter flex justify-between items-center mt-8 border-t border-outline-variant/10 bg-surface-container-lowest">
+<div class="font-label-sm text-label-sm text-primary">© 2026 HACKERMIND // ENCRYPTED_CONNECTION_ESTABLISHED</div>
+<div class="flex gap-6">
+    <span class="font-label-sm text-label-sm text-on-surface-variant opacity-50">Educational Use Only</span>
+</div>
+</footer>
+</main>
+
+<button onclick="document.getElementById('systemInput').focus();" class="fixed bottom-8 right-8 w-16 h-16 bg-primary-container text-on-primary rounded-full shadow-[0_0_25px_rgba(0,230,57,0.5)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-[32px]">terminal</span>
+</button>
+
+<script>
+const agentName = localStorage.getItem('hackermind_agent');
+if (!agentName) window.location.href = '/';
+document.getElementById('agentGreeting').textContent = agentName;
+document.getElementById('headerAgent').textContent = agentName + ' 👾';
+document.getElementById('sidebarAgent').textContent = agentName;
+
+// Load previous scores if any
+const prevResults = localStorage.getItem('hackermind_results');
+if (prevResults) {
+    const data = JSON.parse(prevResults);
+    const scores = data.scores || {};
+    document.getElementById('integrityVal').textContent = (100 - (scores.auth_bypass || 0)) + '%';
+    document.getElementById('xssVal').textContent = (scores.xss || 0) + '%';
+    document.getElementById('networkVal').textContent = (scores.network_attack || 0) + '%';
+    document.getElementById('sqlVal').textContent = (scores.sql_injection || 0) + '%';
+    const risk = data.overall_risk || 0;
+    document.getElementById('threatLevel').textContent = risk > 70 ? 'CRITICAL' : risk > 40 ? 'HIGH' : 'MODERATE';
+} else {
+    document.getElementById('threatLevel').textContent = 'AWAITING SCAN';
+}
+
+function fillExample(type) {
+    const examples = {
+        'web': 'A web application with login page, MySQL database, REST API hosted on AWS EC2 with admin panel accessible from internet',
+        'bank': 'A banking mobile app with fingerprint login, PostgreSQL database, payment gateway API hosted on Google Cloud with admin dashboard',
+        'hospital': 'A hospital management system with patient records, Windows Server, internal WiFi network, connected medical devices and staff login portal',
+        'cloud': 'A cloud infrastructure with Kubernetes clusters, microservices, S3 storage, Lambda functions and API Gateway on AWS'
+    };
+    document.getElementById('systemInput').value = examples[type];
+}
+
+async function startAnalysis() {
+    const systemDesc = document.getElementById('systemInput').value.trim();
+    if (!systemDesc) {
+        document.getElementById('systemInput').focus();
+        return;
+    }
+
+    const btn = document.getElementById('analyzeBtn');
+    const progressSection = document.getElementById('progressSection');
+    const progressBar = document.getElementById('progressBar');
+    const progressLabel = document.getElementById('progressLabel');
+    const progressPct = document.getElementById('progressPct');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined">autorenew</span><span class="font-label-sm text-label-sm">ANALYZING...</span>';
+    progressSection.classList.remove('hidden');
+    document.getElementById('threatLevel').textContent = 'ANALYZING...';
+
+    const steps = [
+        {label: 'AGENT_ANALYZER: Mapping system architecture...', pct: 20},
+        {label: 'AGENT_ATTACKER: Identifying vulnerabilities...', pct: 45},
+        {label: 'AGENT_DEFENDER: Building defense strategies...', pct: 70},
+        {label: 'AGENT_REPORTER: Generating security report...', pct: 85},
+        {label: 'AGENT_SCORER: Calculating risk scores...', pct: 95},
+    ];
+
+    let stepIndex = 0;
+    const stepInterval = setInterval(() => {
+        if (stepIndex < steps.length) {
+            progressLabel.textContent = steps[stepIndex].label;
+            progressPct.textContent = steps[stepIndex].pct + '%';
+            progressBar.style.width = steps[stepIndex].pct + '%';
+            stepIndex++;
+        }
+    }, 3000);
+
+    try {
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({system_description: systemDesc})
+        });
+
+        const data = await response.json();
+        clearInterval(stepInterval);
+
+        progressLabel.textContent = 'ANALYSIS COMPLETE ✓';
+        progressPct.textContent = '100%';
+        progressBar.style.width = '100%';
+
+        const risk = data.overall_risk;
+        document.getElementById('threatLevel').textContent = risk > 70 ? 'CRITICAL' : risk > 40 ? 'HIGH' : 'MODERATE';
+
+        localStorage.setItem('hackermind_results', JSON.stringify(data));
+
+        setTimeout(() => { window.location.href = '/analyst'; }, 1500);
+
+    } catch (error) {
+        clearInterval(stepInterval);
+        alert('Analysis failed. Make sure Flask server is running.');
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined">radar</span><span class="font-label-sm text-label-sm">LAUNCH ANALYSIS</span>';
+        progressSection.classList.add('hidden');
+    }
+}
+
+// Live feed
+const insights = [
+    "Handshake protocol failed at Grid 04. Retrying...",
+    "New encryption key generated for session_77B.",
+    "User Agent [REDACTED] logged into Sandbox Environment.",
+    "Heuristic analysis complete. No threats detected in Cache.",
+    "SQL injection attempt blocked on endpoint /api/users",
+    "Port scan detected from external IP. Logging...",
+    "Firewall rule updated: blocking subnet 192.168.4.0/24"
+];
+const colors = ["primary", "secondary", "tertiary-fixed-dim", "error"];
+
+setInterval(() => {
+    const feed = document.getElementById('analystFeed');
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'});
+    const newInsight = document.createElement('div');
+    newInsight.className = `border-l-2 border-${color}/40 pl-4 py-1 opacity-0 transition-opacity duration-1000`;
+    newInsight.innerHTML = `<div class="font-label-sm text-label-sm text-${color} mb-1">${time} UTC // SOURCE: SYSTEM</div><div class="font-body-md text-on-surface text-sm">${insights[Math.floor(Math.random() * insights.length)]}</div>`;
+    feed.prepend(newInsight);
+    setTimeout(() => newInsight.classList.remove('opacity-0'), 100);
+    if (feed.children.length > 6) feed.lastElementChild.remove();
+}, 5000);
+
+// Glitch
+setInterval(() => {
+    const elements = document.querySelectorAll('h1, h2, h3');
+    const target = elements[Math.floor(Math.random() * elements.length)];
+    if (target) {
+        target.style.transform = `translateX(${(Math.random() - 0.5) * 3}px)`;
+        target.style.opacity = '0.85';
+        setTimeout(() => { target.style.transform = 'translateX(0)'; target.style.opacity = '1'; }, 100);
+    }
+}, 5000);
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done!"
