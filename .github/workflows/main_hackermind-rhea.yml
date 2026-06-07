@@ -17,13 +17,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      # Build packages directly into a local target directory so Azure can see them immediately
-       Silber - name: Install dependencies
+      - name: Install dependencies
         run: |
           pip install --target=".python_packages" -r requirements.txt
 
-      # Upload absolutely everything including the packages
-       Silber - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
