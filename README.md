@@ -12,7 +12,7 @@ Cybersecurity threats don't announce themselves. They hide in plain sight — in
 
 Describe any system. Five specialized AI agents — powered by Microsoft Foundry IQ (Azure OpenAI gpt-4.1-mini) — will dissect it from every angle: architecture mapping, vulnerability hunting, defense strategy, security reporting, and risk scoring. All in real time. All in one platform.
 
-Built for Microsoft Agents League 2026 — Creative Apps Track.
+Built for Microsoft Agents League Hackathon 2026 — Creative Apps Track.
 
 ---
 
