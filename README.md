@@ -1,10 +1,12 @@
 # HackerMind 🧠🔓
 
-![Microsoft](https://img.shields.io/badge/Microsoft-Agents%20League%20Hackathon%202026-blue)
-![Foundry IQ](https://img.shields.io/badge/Powered%20by-Foundry%20IQ-cyan)
-![Azure](https://img.shields.io/badge/Hosted%20on-Azure-blue)
-![Python](https://img.shields.io/badge/Python-Flask-green)
-![GitHub Copilot](https://img.shields.io/badge/Built%20with-GitHub%20Copilot-black)
+![Microsoft](https://img.shields.io/badge/Microsoft-Agents%20League%20Hackathon%202026-blue?style=flat)
+![Track](https://img.shields.io/badge/Track-Creative%20Apps-purple?style=flat)
+![Foundry IQ](https://img.shields.io/badge/Powered%20by-Foundry%20IQ-cyan?style=flat)
+![Azure](https://img.shields.io/badge/Hosted%20on-Azure-blue?style=flat)
+![Live Demo](https://img.shields.io/badge/Live-Demo-green?style=flat)
+![GitHub Copilot](https://img.shields.io/badge/Built%20with-GitHub%20Copilot-black?style=flat)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)
 
 > **Five AI agents. One target. Complete visibility.**
 
