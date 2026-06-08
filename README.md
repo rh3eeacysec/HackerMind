@@ -109,7 +109,7 @@ A fully immersive cyberpunk interface with:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/hackermind.git
+git clone https://github.com/rh3eeacysec/hackermind.git
 cd hackermind
 
 # Install dependencies
