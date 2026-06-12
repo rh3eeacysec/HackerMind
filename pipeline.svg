@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 260" width="100%" height="100%">
+  <defs>
+    <style>
+      @keyframes pulseText {
+        0%, 100% { fill: #8892b0; opacity: 0.8; }
+        50% { fill: #00F0FF; opacity: 1; filter: drop-shadow(0 0 4px #00F0FF); }
+      }
+      @keyframes tracePath {
+        0% { stroke-dashoffset: 2400; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes activeNode1 { 0%, 15%, 85%, 100% { fill: #11192e; stroke: #1e293b; } 20%, 30% { fill: #0a2540; stroke: #00F0FF; filter: drop-shadow(0 0 8px #00F0FF); } }
+      @keyframes activeNode2 { 0%, 30%, 90%, 100% { fill: #11192e; stroke: #1e293b; } 35%, 45% { fill: #3b111a; stroke: #FF0055; filter: drop-shadow(0 0 8px #FF0055); } }
+      @keyframes activeNode3 { 0%, 45%, 95%, 100% { fill: #11192e; stroke: #1e293b; } 50%, 60% { fill: #052e16; stroke: #00FF66; filter: drop-shadow(0 0 8px #00FF66); } }
+      @keyframes activeNode4 { 0%, 60% { fill: #11192e; stroke: #1e293b; } 65%, 75% { fill: #2e2305; stroke: #FFB300; filter: drop-shadow(0 0 8px #FFB300); } }
+      @keyframes activeNode5 { 0%, 75% { fill: #11192e; stroke: #1e293b; } 80%, 95% { fill: #23052e; stroke: #AA00FF; filter: drop-shadow(0 0 8px #AA00FF); } }
+      
+      .bg { fill: #060913; rx: 12px; }
+      .wire { stroke: #1e293b; stroke-width: 3; fill: none; }
+      .laser { stroke: #00F0FF; stroke-width: 3; fill: none; stroke-dasharray: 80, 400; stroke-dashoffset: 2400; animation: tracePath 6s linear infinite; }
+      .node-base { stroke-width: 2; rx: 6px; }
+      .node1 { animation: activeNode1 6s infinite; }
+      .node2 { animation: activeNode2 6s infinite; }
+      .node3 { animation: activeNode3 6s infinite; }
+      .node4 { animation: activeNode4 6s infinite; }
+      .node5 { animation: activeNode5 6s infinite; }
+      .text-title { font-family: 'Fira Code', monospace, sans-serif; font-size: 11px; font-weight: bold; fill: #ffffff; }
+      .text-subtitle { font-family: 'Fira Code', monospace, sans-serif; font-size: 9px; fill: #8892b0; }
+      .input-box { fill: #1e293b; stroke: #334155; stroke-width: 1; rx: 4px; }
+    </style>
+  </defs>
+
+  <rect width="850" height="260" class="bg" />
+
+  <path d="M 140 80 L 390 80 L 710 80 L 710 180 L 490 180 L 220 180" class="wire" />
+  <path d="M 140 80 L 390 80 L 710 80 L 710 180 L 490 180 L 220 180" class="laser" />
+
+  <g transform="translate(25, 55)">
+    <rect width="90" height="50" class="input-box" />
+    <text x="45" y="28" font-family="'Fira Code', sans-serif" font-size="11" fill="#00F0FF" text-anchor="middle" font-weight="bold">[INPUT]</text>
+  </g>
+
+  <g transform="translate(160, 45)">
+    <rect width="180" height="70" class="node-base node1" />
+    <text x="20" y="30" class="text-title">🔍 AGENT_ANALYZER</text>
+    <text x="20" y="48" class="text-subtitle">Maps System Topology</text>
+  </g>
+
+  <g transform="translate(430, 45)">
+    <rect width="180" height="70" class="node-base node2" />
+    <text x="20" y="30" class="text-title">⚔️ AGENT_ATTACKER</text>
+    <text x="20" y="48" class="text-subtitle">Simulates Threat Vectors</text>
+  </g>
+
+  <g transform="translate(560, 145)">
+    <rect width="180" height="70" class="node-base node3" />
+    <text x="20" y="30" class="text-title">🛡️ AGENT_DEFENDER</text>
+    <text x="20" y="48" class="text-subtitle">Patches Attack Surface</text>
+  </g>
+
+  <g transform="translate(300, 145)">
+    <rect width="180" height="70" class="node-base node4" />
+    <text x="20" y="30" class="text-title">📋 AGENT_REPORTER</text>
+    <text x="20" y="48" class="text-subtitle">Synthesizes Briefings</text>
+  </g>
+
+  <g transform="translate(40, 145)">
+    <rect width="180" height="70" class="node-base node5" />
+    <text x="20" y="30" class="text-title">📊 AGENT_SCORER</text>
+    <text x="20" y="48" class="text-subtitle">Quantifies Risk Index</text>
+  </g>
+</svg>
