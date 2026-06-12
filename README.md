@@ -229,6 +229,3 @@ HackerMind was born from a specific architectural question: *Can an organized te
 * **Core Accelerators:** Powered by Microsoft Foundry IQ and Accelerated via GitHub Copilot
 
 *Five agents. One environment. Absolute clarity regarding your security stance in seconds. Defend with precision. Code with confidence.*
-
-```
-
